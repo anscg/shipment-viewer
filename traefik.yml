@@ -1,0 +1,36 @@
+http:
+  routers:
+    shipment-viewer:
+      rule: "Host(`shipment-viewer.hackclub.com`)"
+      service: shipment-viewer
+      entryPoints:
+        - web
+      middlewares:
+        - redirectregex
+    api:
+      rule: "PathPrefix(`/api/presign`)"
+      service: shipment-viewer
+      entryPoints:
+        - web
+    dyn:
+      rule: "PathPrefix(`/dyn`)"
+      service: shipment-viewer
+      entryPoints:
+        - web
+
+  services:
+    shipment-viewer:
+      loadBalancer:
+        servers:
+          - url: "http://localhost:4567"
+
+  middlewares:
+    redirectregex:
+      redirectRegex:
+        regex: "^/shipments\\?email=(.*)&signature=(.*)$"
+        replacement: "/dyn/shipments/$1?signature=$2"
+        permanent: true
+
+entryPoints:
+  web:
+    address: ":80"
