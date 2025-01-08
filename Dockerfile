@@ -4,6 +4,13 @@ WORKDIR /code
 COPY . /code
 RUN bundle install
 
-CMD ["bundle", "exec", "rackup", "--host", "0.0.0.0", "-p", "4567"]
+# Install Nginx
+RUN apt-get update && apt-get install -y nginx
 
-EXPOSE 4567
+# Copy Nginx configuration file
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Start Nginx and the Ruby application
+CMD service nginx start && bundle exec rackup --host 0.0.0.0 -p 4567
+
+EXPOSE 80 4567
