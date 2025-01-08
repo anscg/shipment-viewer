@@ -9,4 +9,4 @@ RUN apt-get update && apt-get install -y nginx
 COPY nginx.conf /etc/nginx/nginx.conf
 EXPOSE 80 4567
 
-CMD service nginx start && bundle exec rackup --host 0.0.0.0 -p 4567
+CMD ["sh", "-c", "nginx && bundle exec rackup --host 0.0.0.0 -p 4567"]
