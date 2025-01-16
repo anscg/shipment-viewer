@@ -93,6 +93,10 @@ class Shipment < Norairrecord::Table
       source_record: source_url
     }.compact.to_json
   end
+
+  def internal_info_partial
+    nil
+  end
 end
 
 class WarehouseShipment < Shipment
@@ -161,7 +165,6 @@ class WarehouseShipment < Shipment
   def description
     return "it's a surprise!" if hide_contents?
     begin
-      puts "awa#{source_id}"
       fields['user_facing_description'] ||
         fields["Warehouse–Items Shipped JSON"] && JSON.parse(fields["Warehouse–Items Shipped JSON"]).select {|item| (item["quantity"]&.to_i || 0) > 0}.map do |item|
           "#{item["quantity"]}x #{item["name"]}"
@@ -169,6 +172,10 @@ class WarehouseShipment < Shipment
     rescue JSON::ParserError
       "error parsing JSON for #{source_id}!"
     end
+  end
+
+  def internal_info_partial
+    :_warehouse_internal_info
   end
 end
 
@@ -239,6 +246,10 @@ class HighSeasShipment < Shipment
 
   def shipped?
     fields['status'] == 'fulfilled'
+  end
+
+  def internal_info_partial
+    :_highseas_internal_info
   end
 end
 
